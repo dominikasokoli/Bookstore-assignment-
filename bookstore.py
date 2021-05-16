@@ -3,7 +3,7 @@ import requests
 import re
 import getpass
 import os
-import subprocess
+
 
 basket_items = [ 'Harry Potter', '21 lessons for 21st Century', 'Crime and Punishment', 'Python for Data Analysis' ]
 basket_author = ['J.K.Rowling', 'Yuval Noah Harari', 'Fiodor Dostojewski', 'Wes McKinney' ]
@@ -32,7 +32,25 @@ if input_title in basket_items:
     print("You’ve added {0} copy/copies of {1} to your basket!" .format(input_quantity, input_title))
 else:
     print("Such book is not available. You will be redirected to another bookstore.")
-    #subprocess.run(['script.py'])
+
+    import selenium
+    from selenium import webdriver
+    from selenium.webdriver.support.select import Select
+
+    driver = webdriver.Firefox()
+    driver.get("http://www.empik.com")
+
+    search_input = driver.find_element_by_xpath('//*[@id="bq"]')
+    search_input.send_keys(input_title)
+    close_button = driver.find_element_by_xpath('/html/body/main/footer/div[5]/div[2]/div[1]/button')
+    close_button.click()
+    search_category = driver.find_element_by_xpath('//*[@id="searchSet"]/div[2]/button')
+    search_category.click()
+    search_category_book = driver.find_element_by_xpath('//*[@id="searchSet"]/div[2]/div/label[14]')
+    search_category_book.click()
+    search_btn = driver.find_element_by_xpath('//*[@id="searchSet"]/button')
+    search_btn.click()
+
 
 print("Would you like to add another book to your basket?")
 
@@ -54,107 +72,107 @@ elif customer_input == "yes":
     if input_title in price_dictionary:
         print("Total price for {} copy/copies of {} is".format(input_quantity, input_title), price_dictionary[input_title] * input_quantity)
 
-#test adding Harry Potter book to basket
-class TestAddBook(unittest.TestCase):
-    def test_add_book_success(self):
-        actual = input_title
-        expected = "Harry Potter"
-        self.assertEqual(actual, expected)
+    #test adding Harry Potter book to basket
+    class TestAddBook(unittest.TestCase):
+        def test_add_book_success(self):
+            actual = input_title
+            expected = "Harry Potter"
+            self.assertEqual(actual, expected)
 
-#test book not in bookstore
-class TestAddWrongBook(unittest.TestCase):
-    def test_add_book_success(self):
-        self.assertIn(input_title, basket_items, msg="Book in store!")
+    #test book not in bookstore
+    class TestAddWrongBook(unittest.TestCase):
+        def test_add_book_success(self):
+            self.assertIn(input_title, basket_items, msg="Book in store!")
 
-#test title is not None
-class TestTitle(unittest.TestCase):
-    def test_title_not_none(self):
-        assert input_title is not None
+    #test title is not None
+    class TestTitle(unittest.TestCase):
+        def test_title_not_none(self):
+            assert input_title is not None
 
-#test quantity
-class TestQuantity(unittest.TestCase):
-    def test_quantity_success(self):
-        self.assertGreaterEqual(input_quantity, 1)
+    #test quantity
+    class TestQuantity(unittest.TestCase):
+        def test_quantity_success(self):
+            self.assertGreaterEqual(input_quantity, 1)
 
-#Registration - API call
-print("Please create an account to purchase.")
-input_email = input("Please input email ")
-input_password = getpass.getpass('Please input password')
-input_name = input("What's your name?")
-
-
-score = 0
-while True:
-    if (len(input_password)<8):
-        score = -1
-        break
-    elif not re.search("[a-z]", input_password):
-        score = -1
-        break
-    elif not re.search("[A-Z]", input_password):
-        score = -1
-        break
-    elif not re.search("[0-9]", input_password):
-        score = -1
-        break
-    elif not re.search("[_@$]", input_password):
-        score = -1
-        break
-    else:
-        score = 0
-        print("Password approved")
-
-        param_email = {"email": input_email}
-        param_pass = {"password": input_password}
-        response = requests.post("https://reqres.in/api/users/2", param_email, param_pass)
-        print(response)
-        assert response.status_code == 201
-
-        break
-
-if score ==-1:
-    print("Your password is too weak")
+    #Registration - API call
+    print("Please create an account to purchase.")
+    input_email = input("Please input email ")
     input_password = getpass.getpass('Please input password')
-
-print("You signed up successfully. Now you'll have to sign in. ")
-
-
-#Login - API call
-input_email_signin = input("Please input email ")
-input_password_signin = getpass.getpass('Please input password')
+    input_name = input("What's your name?")
 
 
-param_email_signin = {"email": input_email_signin}
-param_pass_signin = {"password": input_password_signin}
-response = requests.post("https://reqres.in/api/login", param_email_signin, param_pass_signin)
-print(response)
-#assert response.status_code == 421
+    score = 0
+    while True:
+        if (len(input_password)<8):
+            score = -1
+            break
+        elif not re.search("[a-z]", input_password):
+            score = -1
+            break
+        elif not re.search("[A-Z]", input_password):
+            score = -1
+            break
+        elif not re.search("[0-9]", input_password):
+            score = -1
+            break
+        elif not re.search("[_@$]", input_password):
+            score = -1
+            break
+        else:
+            score = 0
+            print("Password approved")
 
-#test if sign up and sign in match
-class TestCredentials(unittest.TestCase):
-    def test_credentials(self):
-        self.assertEqual(input_email, input_email_signin)
-        self.assertEqual(input_password, input_password_signin)
+            param_email = {"email": input_email}
+            param_pass = {"password": input_password}
+            response = requests.post("https://reqres.in/api/users/2", param_email, param_pass)
+            print(response)
+            assert response.status_code == 201
 
-#test if email contains @
-class TestEmailFormat(unittest.TestCase):
-    def test_email_format(self):
-        self.assertIn("@", input_email)
+            break
 
-#checkout
-print("{0} redeem your gift card" .format(input_name))
-valid_gift_cards = ['bookdiscount1', 'booksdiscount2', 'bookdiscount3', 'bookdisocunt4']
-gift_card = input("Please input your gift card ")
+    if score ==-1:
+        print("Your password is too weak")
+        input_password = getpass.getpass('Please input password')
 
-if gift_card in valid_gift_cards:
-    print("Gift card added successfully!")
-else:
-    print("Such gift card does not exist")
+    print("You signed up successfully. Now you'll have to sign in. ")
 
-#test if gift card is valid
-class TestGiftCard(unittest.TestCase):
-    def test_gift_card(self):
-        self.assertIn(gift_card, valid_gift_cards)
+
+    #Login - API call
+    input_email_signin = input("Please input email ")
+    input_password_signin = getpass.getpass('Please input password')
+
+
+    param_email_signin = {"email": input_email_signin}
+    param_pass_signin = {"password": input_password_signin}
+    response = requests.post("https://reqres.in/api/login", param_email_signin, param_pass_signin)
+    print(response)
+    #assert response.status_code == 421
+
+    #test if sign up and sign in match
+    class TestCredentials(unittest.TestCase):
+        def test_credentials(self):
+            self.assertEqual(input_email, input_email_signin)
+            self.assertEqual(input_password, input_password_signin)
+
+    #test if email contains @
+    class TestEmailFormat(unittest.TestCase):
+        def test_email_format(self):
+            self.assertIn("@", input_email)
+
+    #checkout
+    print("{0} redeem your gift card" .format(input_name))
+    valid_gift_cards = ['bookdiscount1', 'booksdiscount2', 'bookdiscount3', 'bookdisocunt4']
+    gift_card = input("Please input your gift card ")
+
+    if gift_card in valid_gift_cards:
+        print("Gift card added successfully!")
+    else:
+        print("Such gift card does not exist")
+
+    #test if gift card is valid
+    class TestGiftCard(unittest.TestCase):
+        def test_gift_card(self):
+            self.assertIn(gift_card, valid_gift_cards)
 
 if __name__ == '__main__':
     unittest.main()

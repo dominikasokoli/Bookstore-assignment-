@@ -1,13 +1,33 @@
 import selenium
 from selenium import webdriver
 from selenium.webdriver.support.select import Select
+from time import sleep
+import unittest
 
-w=webdriver.Firefox()
-w.get("http://www.empik.com")
-#searchbutton_empik = WebDriverWait(w, 10).until(EC.element_to_be_clickable(By.CSS_SELECTOR, "input[name=’q-i’]"))
-#searchbutton_empik.clear()
+#Preliminatory conditions
+class EmpikBookSearching(unittest.TestCase):
+    def setUp(self):
+        driver = webdriver.Firefox()
+        driver.get("http://www.empik.com")
+        driver.implicity_wait(60)
 
-search_input = w.find_element_by_xpath('//*[@id="bq"]')
-search_input.send_keys('Harry Potter')
-search_btn = w.find_element_by_xpath('//*[@id="searchSet"]/button')
-search_btn.click()
+#Test steps
+    def testInvalidEmail(self):
+        driver = self.driver
+        search_input = driver.find_element_by_xpath('//*[@id="bq"]')
+        search_input.send_keys('Harry Potter')
+        close_button = driver.find_element_by_xpath('/html/body/main/footer/div[5]/div[2]/div[1]/button')
+        close_button.click()
+        search_category = driver.find_element_by_xpath('//*[@id="searchSet"]/div[2]/button')
+        search_category.click()
+        search_category_book = driver.find_element_by_xpath('//*[@id="searchSet"]/div[2]/div/label[14]')
+        search_category_book.click()
+        search_btn = driver.find_element_by_xpath('//*[@id="searchSet"]/button')
+        search_btn.click()
+
+    def tearDown(self):
+        #finish test
+        self.driver.quit()
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
